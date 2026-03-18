@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  soares-carlis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: soares-carlis-site
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    # Se usar Traefik/Nginx Proxy Manager, use labels e remova ports:
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.soarescarlis.rule=Host(`soaresecarlis.adv.br`)"
+    #   - "traefik.http.routers.soarescarlis.entrypoints=websecure"
+    #   - "traefik.http.routers.soarescarlis.tls.certresolver=letsencrypt"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
+    # Se usar rede externa do Traefik:
+    # external: true
+    # name: traefik_net
